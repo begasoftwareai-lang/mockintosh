@@ -1,6 +1,17 @@
-FROM python:3.9.7-alpine
+FROM python:3.9-slim AS runtime
 
-RUN apk add --no-cache gcc musl-dev librdkafka-dev
+# Evita prompts y reduce tamaño
+ENV DEBIAN_FRONTEND=noninteractive \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+# Dependencias de build y librerías nativas
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential gcc curl ca-certificates \
+      librdkafka-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 
 WORKDIR /usr/src/mockintosh
 
